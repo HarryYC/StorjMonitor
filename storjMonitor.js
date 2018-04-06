@@ -11,6 +11,7 @@ var token = "YOUR-TOKEN-HERE"; //api token can be create under "Nodes" -> "API-K
 var daemon_host= "127.0.0.1"; //where the storj daemon is running
 var daemon_port= 45015; //on which port storj daemon is listening
 var log = console.log;
+var path = "NODE-PATH-HERE"
 
 console.log = function () {
     var first_parameter = arguments[0];
@@ -34,6 +35,14 @@ function fParseNodes() {
 		rpc.status(function(err, shares) {
 			daemon.end();
 			shares.forEach((share) => {
+        if (share.state == 0) {
+          const { exec } = require('child_process');
+          var shareID = share.id
+          console.log(JSON.stringify(share.id) + ' || is not working, restaring');
+          var text = `storjshare start --config ${path}${shareID}.json --unsafe`
+          console.log(text);
+          exec(text, (err, data, stderr) => console.log(data));
+        }
 				console.log(share.id + ' | Submit to Storjstat');
 				fSubmitData(share.id, share.meta);
 			});
